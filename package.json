@@ -1,0 +1,11 @@
+{
+  "name": "chatscript",
+  "version": "0.0.0",
+  "description": "A script language for chatbots",
+  "keywords": [
+    "chatbot",
+    "script"
+  ],
+  "author": "Jack Lu <jacklu@jacklu.me>",
+  "license": "ISC"
+}
