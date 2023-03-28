@@ -7,5 +7,9 @@
     "script"
   ],
   "author": "Jack Lu <jacklu@jacklu.me>",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "l": "github:panlina/l",
+    "ohm-js": "^0.14.0"
+  }
 }
