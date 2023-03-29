@@ -1,8 +1,9 @@
-exports.parse = require('./parse');
-exports.Expression = require('l/Expression');
-exports.Statement = require('./Statement');
-exports.EventHandler = require('./EventHandler');
-exports.Label = require('l/Label');
-exports.Scope = require('l/Scope');
-exports.Environment = require('l/Environment');
-exports.ParseError = require('l/ParseError');
+module.exports = require('./chatscript');
+module.exports.parse = require('./parse');
+module.exports.Expression = require('l/Expression');
+module.exports.Statement = require('./Statement');
+module.exports.EventHandler = require('./EventHandler');
+module.exports.Label = require('l/Label');
+module.exports.Scope = require('l/Scope');
+module.exports.Environment = require('l/Environment');
+module.exports.ParseError = require('l/ParseError');
