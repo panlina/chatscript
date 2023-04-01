@@ -7,3 +7,6 @@ module.exports.Label = require('l/Label');
 module.exports.Scope = require('l/Scope');
 module.exports.Environment = require('l/Environment');
 module.exports.ParseError = require('l/ParseError');
+module.exports.Error = require('l/Error');
+module.exports.Machine = require('./Machine');
+module.exports.Value = require('l/Value');
