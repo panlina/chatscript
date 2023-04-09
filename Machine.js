@@ -1,16 +1,28 @@
 /** @typedef {import('./Program').default} Program */
+/**
+ * @template T
+ * @typedef {import('l/Environment')<T>} Environment<T>
+ */
+/** @typedef {import('l/Value')} Value */
 var Scope = require('l/Scope');
 var EventHandler = require('./EventHandler');
 var Value = require('l/Value');
 var extractFunctionArgumentNames = require('l/extractFunctionArgumentNames');
-class Machine extends require('l/Machine') {
-	*_run(program) {
+class Machine extends require('./Machine.Async') {
+	/** @param {Environment<Value>} environment */
+	constructor(environment) {
+		super(environment);
+	}
+	async *_run(program) {
 		if (program instanceof Array)
 			return yield* super._run(
 				program.filter(statement => !(statement instanceof EventHandler))
 			);
 		else
 			return yield* super._run(program);
+	}
+	assign(expression, value) {
+		this.sync.assign(expression, value);
 	}
 	run(program) {
 		super.run(program);
@@ -22,7 +34,7 @@ class Machine extends require('l/Machine') {
 	 * @param {string} event.type
 	 * @param {Value} event.argument
 	 */
-	*emit(event) {
+	async *emit(event) {
 		/** @type {EventHandler[]} */
 		var eventHandler = this.program.filter(
 			statement =>
@@ -37,7 +49,7 @@ class Machine extends require('l/Machine') {
 	 * @param {EventHandler} eventHandler
 	 * @param {Value} argument
 	 */
-	*callEventHandler(eventHandler, argument) {
+	async *callEventHandler(eventHandler, argument) {
 		this.callStack.unshift({ current: eventHandler, environment: this.environment });
 		var environment = this.environment;
 		this.environment = this.environment.push(new Scope({}));
