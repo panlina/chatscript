@@ -4,21 +4,39 @@
  * @typedef {import('l/Environment')<T>} Environment<T>
  */
 /** @typedef {import('l/Value')} Value */
+/** @typedef {import('./Implementation').default} Implementation */
 var Scope = require('l/Scope');
+var Statement = require('l/Statement');
 var EventHandler = require('./EventHandler');
 var Value = require('l/Value');
 var extractFunctionArgumentNames = require('l/extractFunctionArgumentNames');
 class Machine extends require('./Machine.Async') {
-	/** @param {Environment<Value>} environment */
-	constructor(environment) {
+	/**
+	 * @param {Environment<Value>} environment
+	 * @param {Implementation} implementation
+	 */
+	constructor(environment, implementation) {
 		super(environment);
+		/** @type {Implementation} */
+		this.implementation = implementation;
 	}
 	async *_run(program) {
 		if (program instanceof Array)
 			return yield* super._run(
 				program.filter(statement => !(statement instanceof EventHandler))
 			);
-		else
+		else if (program instanceof Statement) {
+			var statement = program;
+			switch (statement.type) {
+				case 'send':
+					var $message = yield* this._run(statement.message);
+					var $receiver = yield* this._run(statement.receiver);
+					// TODO: check $message, $receiver
+					await this.implementation.send($message, $receiver);
+					yield statement;
+					break;
+			}
+		} else
 			return yield* super._run(program);
 	}
 	assign(expression, value) {
