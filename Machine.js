@@ -10,7 +10,7 @@ var Statement = require('l/Statement');
 var EventHandler = require('./EventHandler');
 var Value = require('l/Value');
 var extractFunctionArgumentNames = require('l/extractFunctionArgumentNames');
-class Machine extends require('./Machine.Async') {
+class Machine extends require('./Machine.async') {
 	/**
 	 * @param {Environment<Value>} environment
 	 * @param {Implementation} implementation
@@ -38,9 +38,6 @@ class Machine extends require('./Machine.Async') {
 			}
 		} else
 			return yield* super._run(program);
-	}
-	assign(expression, value) {
-		this.sync.assign(expression, value);
 	}
 	run(program) {
 		super.run(program);
