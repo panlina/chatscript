@@ -35,6 +35,8 @@ class Machine extends require('./Machine.async') {
 					await this.implementation.send($message, $receiver);
 					yield statement;
 					break;
+				default:
+					yield* super._run(statement);
 			}
 		} else
 			return yield* super._run(program);
