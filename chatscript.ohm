@@ -2,7 +2,8 @@ chatscript <: l {
 	Program := (EventHandler | Statement | Label)*
 	EventHandler = EventHandlerReceive
 	EventHandlerReceive = "on" "receive" Expression "do" Statement
-	Statement += StatementSend
+	Statement += StatementReceive | StatementSend
+	StatementReceive = "receive" Expression "from" Expression ";"
 	StatementSend = "send" Expression "to" Expression ";"
-	identifier := ~(("let" | "var" | "goto" | "while" | "do" | "break" | "send" | "to") ~(alnum|"_")) &(letter|"_") (alnum|"_")+	// +send, to
+	identifier := ~(("let" | "var" | "goto" | "while" | "do" | "break" | "receive" | "send" | "from" | "to") ~(alnum|"_")) &(letter|"_") (alnum|"_")+	// +receive, send, from, to
 }

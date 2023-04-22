@@ -31,3 +31,34 @@ it('', async () => {
 	assert(chatscript.Value.equals(response.message, new chatscript.Value.String('dong')));
 	assert(chatscript.Value.equals(response.receiver.property['name'], new chatscript.Value.String('a')));
 });
+it('echo', async () => {
+	var script = chatscript`
+		while 1 do {
+			var message;
+			var sender;
+			receive message from sender;
+			send message.text to sender;
+		}
+	`;
+	var environment = new chatscript.Environment(new chatscript.Scope({}));
+	var sender = new chatscript.Value.Object({
+		name: new chatscript.Value.String('a')
+	});
+	var message = new chatscript.Value.Object({
+		text: new chatscript.Value.String('a'),
+		from: sender
+	});
+	var request = [message, sender];
+	var response;
+	var machine = new chatscript.Machine(environment, {
+		receive: async () => request,
+		send: async (message, receiver) => {
+			response = { message: message, receiver: receiver };
+		}
+	});
+	machine.run(script);
+	while (!await machine.step())
+		if (response) break;
+	assert(chatscript.Value.equals(response.message, new chatscript.Value.String('a')));
+	assert(chatscript.Value.equals(response.receiver.property['name'], new chatscript.Value.String('a')));
+});

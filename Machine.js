@@ -28,6 +28,13 @@ class Machine extends require('./Machine.async') {
 		else if (program instanceof Statement) {
 			var statement = program;
 			switch (statement.type) {
+				case 'receive':
+					yield statement;
+					var [$message, $sender] = await this.implementation.receive();
+					// TODO: check $message, $sender
+					this.assign(statement.message, $message);
+					this.assign(statement.sender, $sender);
+					break;
 				case 'send':
 					var $message = yield* this._run(statement.message);
 					var $receiver = yield* this._run(statement.receiver);
