@@ -32,8 +32,8 @@ class Machine extends require('./Machine.async') {
 					var $message = yield* this._run(statement.message);
 					var $receiver = yield* this._run(statement.receiver);
 					// TODO: check $message, $receiver
-					await this.implementation.send($message, $receiver);
 					yield statement;
+					await this.implementation.send($message, $receiver);
 					break;
 				default:
 					yield* super._run(statement);
