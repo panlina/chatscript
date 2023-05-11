@@ -16,7 +16,7 @@ it('', async () => {
 		}
 	});
 	machine.run(script);
-	while (!await machine.step());
+	while (!machine.step(machine.await ? await machine.await : undefined));
 	assert(chatscript.Value.equals(environment.scope.name['a'], new chatscript.Value.Number(26)));
 	var g = machine.emit({
 		type: 'receive',
@@ -27,7 +27,10 @@ it('', async () => {
 			})
 		})
 	});
-	while (!(await g.next()).done);
+	for (; ;) {
+		var { value: value, done: done } = g.next(value instanceof Promise ? await value : undefined);
+		if (done) break;
+	}
 	assert(chatscript.Value.equals(response.message, new chatscript.Value.String('dong')));
 	assert(chatscript.Value.equals(response.receiver.property['name'], new chatscript.Value.String('a')));
 });
@@ -57,7 +60,7 @@ it('echo', async () => {
 		}
 	});
 	machine.run(script);
-	while (!await machine.step())
+	while (!machine.step(machine.await ? await machine.await : undefined))
 		if (response) break;
 	assert(chatscript.Value.equals(response.message, new chatscript.Value.String('a')));
 	assert(chatscript.Value.equals(response.receiver.property['name'], new chatscript.Value.String('a')));

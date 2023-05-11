@@ -6,11 +6,11 @@
 /** @typedef {import('l/Value')} Value */
 /** @typedef {import('./Implementation').default} Implementation */
 var Scope = require('l/Scope');
-var Statement = require('l/Statement');
+var Statement = require('./Statement');
 var EventHandler = require('./EventHandler');
 var Value = require('l/Value');
 var extractFunctionArgumentNames = require('l/extractFunctionArgumentNames');
-class Machine extends require('./Machine.async') {
+class Machine extends require('l/Machine') {
 	/**
 	 * @param {Environment<Value>} environment
 	 * @param {Implementation} implementation
@@ -20,7 +20,24 @@ class Machine extends require('./Machine.async') {
 		/** @type {Implementation} */
 		this.implementation = implementation;
 	}
-	async *_run(program) {
+	step(value) {
+		if (this.await) delete this.await;
+		for (; ;) {
+			var { value: value, done: done } = this.generator.next(value);
+			if (done)
+				this.return = value;
+			else
+				if (value instanceof Promise)
+					this.await = value;
+				else {
+					this.current = value;
+					if (!value.node) continue;
+				}
+			break;
+		}
+		return done;
+	}
+	*_run(program) {
 		if (program instanceof Array)
 			return yield* super._run(
 				program.filter(statement => !(statement instanceof EventHandler))
@@ -30,7 +47,7 @@ class Machine extends require('./Machine.async') {
 			switch (statement.type) {
 				case 'receive':
 					yield statement;
-					var [$message, $sender] = await this.implementation.receive();
+					var [$message, $sender] = yield this.implementation.receive();
 					// TODO: check $message, $sender
 					this.assign(statement.message, $message);
 					this.assign(statement.sender, $sender);
@@ -40,7 +57,7 @@ class Machine extends require('./Machine.async') {
 					var $receiver = yield* this._run(statement.receiver);
 					// TODO: check $message, $receiver
 					yield statement;
-					await this.implementation.send($message, $receiver);
+					yield this.implementation.send($message, $receiver);
 					break;
 				default:
 					yield* super._run(statement);
@@ -58,7 +75,7 @@ class Machine extends require('./Machine.async') {
 	 * @param {string} event.type
 	 * @param {Value} event.argument
 	 */
-	async *emit(event) {
+	*emit(event) {
 		/** @type {EventHandler[]} */
 		var eventHandler = this.program.filter(
 			statement =>
@@ -73,7 +90,7 @@ class Machine extends require('./Machine.async') {
 	 * @param {EventHandler} eventHandler
 	 * @param {Value} argument
 	 */
-	async *callEventHandler(eventHandler, argument) {
+	*callEventHandler(eventHandler, argument) {
 		this.callStack.unshift({ current: eventHandler, environment: this.environment });
 		var environment = this.environment;
 		this.environment = this.environment.push(new Scope({}));
