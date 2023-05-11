@@ -5,7 +5,7 @@ it('', async () => {
 		let a = 26;
 		on receive message do (
 			message.text = "ding" ?
-				(send "dong" to message.from;) : 0
+				(send "dong" to message.sender;) : 0
 		);
 	`;
 	var environment = new chatscript.Environment(new chatscript.Scope({ a: new chatscript.Value.Undefined() }));
@@ -22,7 +22,7 @@ it('', async () => {
 		type: 'receive',
 		argument: new chatscript.Value.Object({
 			text: new chatscript.Value.String('ding'),
-			from: new chatscript.Value.Object({
+			sender: new chatscript.Value.Object({
 				name: new chatscript.Value.String('a')
 			})
 		})
@@ -46,7 +46,7 @@ it('echo', async () => {
 	});
 	var message = new chatscript.Value.Object({
 		text: new chatscript.Value.String('a'),
-		from: sender
+		sender: sender
 	});
 	var request = [message, sender];
 	var response;
