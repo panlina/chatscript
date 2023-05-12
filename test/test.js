@@ -40,17 +40,14 @@ it('echo', async () => {
 			var message;
 			var sender;
 			receive message from sender;
-			send message.text to sender;
+			send message to sender;
 		}
 	`;
 	var environment = new chatscript.Environment(new chatscript.Scope({}));
 	var sender = new chatscript.Value.Object({
 		name: new chatscript.Value.String('a')
 	});
-	var message = new chatscript.Value.Object({
-		text: new chatscript.Value.String('a'),
-		sender: sender
-	});
+	var message = new chatscript.Value.String('a');
 	var request = [message, sender];
 	var response;
 	var machine = new chatscript.Machine(environment, {
